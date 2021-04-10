@@ -12,6 +12,7 @@ export interface ParserOptions {
   notifyOnChangeOnly: boolean
   url: string
   userAgent: string
+  additionalHeaders:  { [key: string]: string; } 
 }
 
 export interface ParserEvents {
@@ -38,6 +39,7 @@ export class Parser extends EventEmitter {
     notifyOnChangeOnly: false,
     url: '',
     userAgent: 'icecast-parser',
+    additionalHeaders: {}, //{ "name": "value", "name1": "value1"},
   };
 
   public constructor (options: Partial<ParserOptions>) {
@@ -91,6 +93,9 @@ export class Parser extends EventEmitter {
       : http.request(this.options.url);
 
     request.setHeader('Icy-MetaData', '1');
+    Object.keys(this.options.additionalHeaders).forEach((prop)=> 
+      request.setHeader(prop, this.options.additionalHeaders[prop])
+    );
     request.setHeader('User-Agent', this.options.userAgent);
     request.once('socket', (socket) => socket.once('end', this.onSocketEnd.bind(this)));
     request.once('response', this.onRequestResponse.bind(this));

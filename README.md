@@ -1,5 +1,35 @@
 # icecast-parser
 
+Forked to add additional Headers for Basic Authentication
+## additionalHeaders Usage :
+
+```javascript
+const Parser = require('icecast-parser');
+const LameDecoder = require("@suldashi/lame");
+var Speaker = require('speaker');
+
+var authHeaderValue = 'Basic ' + Buffer.from('username:password').toString('base64');
+
+const radioStation = new Parser({
+    url: 'https://live.hunter.fm/80s'
+    keepListen: true,
+    additionalHeaders: { CustomHeader : "Awesome Value", Authorization: authHeaderValue },
+});
+
+radioStation
+.on('metadata', (metadata) => {
+    console.log(`${metadata.get('StreamTitle') ?? 'unknown'}\n`);
+})
+.on('stream', (stream) => {
+    stream.pipe(new LameDecoder.Decoder())
+    .pipe(new Speaker());
+})
+.on("error", function (error) {
+    console.log(error);
+});
+
+```
+
 [![Build Status](https://travis-ci.com/ghaiklor/icecast-parser.svg?branch=master)](https://travis-ci.com/ghaiklor/icecast-parser)
 [![Code Coverage](https://codecov.io/gh/ghaiklor/icecast-parser/branch/master/graph/badge.svg)](https://codecov.io/gh/ghaiklor/icecast-parser)
 
